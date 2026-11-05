@@ -1,0 +1,144 @@
+biofeedback-htn/
+│
+├── README.md
+├── pyproject.toml                 # deps, build, tool config
+├── requirements.txt               # pinned (optional, for reproducibility)
+├── .gitignore
+├── .pre-commit-config.yaml
+├── Makefile                       # common commands: make test, make eval, make app
+│
+├── configs/                       # YAML/TOML configs — no magic numbers in code
+│   ├── default.yaml
+│   ├── preprocessing.yaml
+│   ├── features.yaml
+│   ├── biofeedback.yaml
+│   ├── evaluation.yaml
+│   └── datasets/
+│       ├── bidmc.yaml
+│       ├── fantasia.yaml
+│       ├── mitdb.yaml
+│       ├── ppg_dalia.yaml
+│       └── wesad.yaml
+│
+├── data/                          # NEVER committed (gitignored)
+│   ├── raw/                       # original datasets
+│   ├── interim/                   # parsed, resampled
+│   ├── processed/                 # feature-ready windows
+│   ├── external/                  # Noise Stress Test DB, reference annotations
+│   └── sessions/                  # SQLite DB + exported session summaries
+│
+├── src/
+│   └── biofeedback/
+│       ├── __init__.py
+│       │
+│       ├── acquisition/           # ROW 1
+│       │   ├── __init__.py
+│       │   ├── base.py            # SignalSource ABC: stream() -> (signal, fs, meta)
+│       │   ├── wfdb_loader.py     # BIDMC, Fantasia, MIT-BIH
+│       │   ├── ppg_dalia_loader.py
+│       │   ├── wesad_loader.py
+│       │   ├── live_source.py     # STUB — plug sensor here later
+│       │   └── registry.py        # name -> source class
+│       │
+│       ├── preprocessing/         # ROW 2
+│       │   ├── __init__.py
+│       │   ├── filters.py         # band-pass, notch
+│       │   ├── windows.py         # sliding window, overlap
+│       │   ├── sqi.py             # signal quality index (skewness, template)
+│       │   ├── quality_gate.py    # 5%-bad-interval discard rule
+│       │   └── artifact.py        # ectopic flagging, saturation
+│       │
+│       ├── features/              # ROW 3
+│       │   ├── __init__.py
+│       │   ├── beat_detection.py  # Elgendi (PPG), Pan–Tompkins (ECG)
+│       │   ├── sub_sample.py      # parabolic interpolation
+│       │   ├── intervals.py       # IBI, tachogram
+│       │   ├── hrv_time.py        # RMSSD, SDNN, pNN50
+│       │   ├── hrv_nonlinear.py   # SD1, SD2
+│       │   ├── hrv_freq.py        # LF/HF (secondary)
+│       │   └── extractor.py       # orchestrator: window -> FeatureSet
+│       │
+│       ├── feedback/              # ROW 4 — biofeedback engine
+│       │   ├── __init__.py
+│       │   ├── pacer.py           # breathing waveform generator
+│       │   ├── rsa_tracker.py     # real-time HR oscillation
+│       │   ├── state.py           # state machine: pace / hold / uncertain
+│       │   └── renderers/
+│       │       ├── base.py
+│       │       ├── visual.py      # expanding/contracting animation
+│       │       └── audio.py       # optional tones
+│       │
+│       ├── session/               # ROW 5
+│       │   ├── __init__.py
+│       │   ├── models.py          # dataclasses: Session, Window, FeatureSet
+│       │   ├── baseline.py        # baseline window protocol + acceptance rule
+│       │   ├── protocol.py        # session flow: baseline -> paced -> recovery
+│       │   ├── store.py           # SQLite schema + CRUD
+│       │   ├── history.py         # Matplotlib history graphs
+│       │   └── export.py          # CSV + HTML summary for health worker
+│       │
+│       ├── evaluation/            # ROW 6
+│       │   ├── __init__.py
+│       │   ├── hr_accuracy.py     # MAE, Bland–Altman
+│       │   ├── prv_vs_hrv.py      # BIDMC agreement study
+│       │   ├── sqi_benchmark.py   # noise injection on NSTDB
+│       │   ├── timing_accuracy.py # feedback latency
+│       │   ├── rsa_response.py    # HR/RSA change during pacing
+│       │   └── report.py          # aggregate + write plots/tables
+│       │
+│       ├── app/                   # thin entry points
+│       │   ├── __init__.py
+│       │   ├── run_session.py     # live/recorded biofeedback session
+│       │   ├── run_eval.py        # CLI for evaluation harness
+│       │   └── cli.py             # argparse / typer entry
+│       │
+│       └── utils/
+│           ├── __init__.py
+│           ├── config.py          # load YAML, typed config
+│           ├── logging.py
+│           ├── timing.py          # monotonic clocks, latency measurement
+│           └── math.py            # shared numeric helpers
+│
+├── tests/
+│   ├── conftest.py
+│   ├── unit/
+│   │   ├── test_filters.py
+│   │   ├── test_sqi.py
+│   │   ├── test_quality_gate.py
+│   │   ├── test_beat_detection.py
+│   │   ├── test_hrv.py
+│   │   └── test_pacer.py
+│   ├── integration/
+│   │   ├── test_pipeline_recorded.py
+│   │   └── test_session_store.py
+│   ├── regression/
+│   │   └── test_eval_golden.py    # golden numbers on a fixed tiny subset
+│   └── fixtures/
+│       ├── tiny_bidmc/
+│       ├── tiny_wesad/
+│       └── synthetic_signals.py
+│
+├── notebooks/                     # exploration only, not part of product
+│   ├── 00_data_provenance.ipynb   # generates subset stats for docs/datasets.md
+│   ├── 01_dataset_probe.ipynb
+│   ├── 02_sqi_exploration.ipynb
+│   └── 03_hrv_validation.ipynb
+│
+├── scripts/
+│   ├── download_datasets.py       # user runs manually; no auto-net in app
+│   ├── build_processed.py         # raw -> interim -> processed
+│   └── run_all_evals.sh
+│
+├── docs/
+│   ├── architecture.md
+│   ├── datasets.md                # subsets used, licenses, selection rationale
+│   ├── signal_quality.md          # the "honest core" rationale
+│   ├── evaluation_protocol.md
+│   ├── scope_and_limits.md        # feasibility ≠ clinical effectiveness
+│   └── decisions/
+│       └── adr-001-live-sensor.md
+│
+└── artifacts/                     # gitignored outputs
+    ├── figures/
+    ├── tables/
+    └── reports/
