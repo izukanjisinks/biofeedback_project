@@ -9,6 +9,10 @@ import wfdb
 from biofeedback.acquisition.base import SignalRecord, SignalSource
 
 
+def _clean(value: str) -> str:
+    return value.strip().rstrip(",").strip()
+
+
 class WFDBSource(SignalSource):
     name = "wfdb"
 
@@ -31,20 +35,23 @@ class WFDBSource(SignalSource):
             record = wfdb.rdrecord(record_id, pn_dir=self.pn_dir, sampto=sampto)
 
         signal = np.asarray(record.p_signal)
-        channel_idx = self._resolve_channel(channel, record.sig_name)
+        sig_names = [_clean(n) for n in record.sig_name]
+        units = [_clean(u) for u in record.units]
+
+        channel_idx = self._resolve_channel(channel, sig_names)
         if channel_idx is not None:
             signal = signal[:, channel_idx]
 
         meta: dict[str, Any] = {
             "record_id": record_id,
-            "sig_name": list(record.sig_name),
-            "units": list(record.units),
+            "sig_name": sig_names,
+            "units": units,
             "n_sig": record.n_sig,
             "sig_len": record.sig_len,
             "comments": list(record.comments or []),
         }
         if channel_idx is not None:
-            meta["channel"] = record.sig_name[channel_idx]
+            meta["channel"] = sig_names[channel_idx]
 
         return SignalRecord(signal=signal, fs=float(record.fs), meta=meta)
 
