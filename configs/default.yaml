@@ -1,0 +1,12 @@
+project:
+  name: biofeedback
+  phase: 1
+  milestone: M1
+
+paths:
+  data_raw: data/raw
+  data_interim: data/interim
+  data_processed: data/processed
+  data_external: data/external
+  sessions: data/sessions
+  artifacts: artifacts

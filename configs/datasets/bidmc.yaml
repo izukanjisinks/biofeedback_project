@@ -1,0 +1,18 @@
+name: bidmc
+source: wfdb
+description: >
+  BIDMC PPG and Respiration Dataset (Pimentel et al., 2017). Simultaneous
+  ECG, PPG and impedance-respiration recordings from critically ill
+  patients, 8 min each, sampled at 125 Hz.
+sampling_rate_hz: 125
+channels:
+  ppg: PLETH
+  ecg: II
+  resp: RESP
+physionet_slug: bidmc
+license: Open Data Commons Attribution License v1.0
+data_dir: data/raw/bidmc
+subset:
+  # Fill in after running notebooks/00_data_provenance.ipynb
+  record_ids: []
+  selection_criteria: ""

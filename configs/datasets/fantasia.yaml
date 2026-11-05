@@ -1,0 +1,15 @@
+name: fantasia
+source: wfdb
+description: >
+  Fantasia Database (Iyengar et al., 1996). 20 young and 20 elderly
+  healthy subjects, 120-minute continuous ECG and respiration at rest.
+sampling_rate_hz: 250
+channels:
+  ecg: ECG
+  resp: RESP
+physionet_slug: fantasia
+license: ODC-By
+data_dir: data/raw/fantasia
+subset:
+  record_ids: []
+  selection_criteria: ""

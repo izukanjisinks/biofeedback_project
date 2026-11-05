@@ -1,0 +1,16 @@
+name: mitdb
+source: wfdb
+description: >
+  MIT-BIH Arrhythmia Database (Moody & Mark, 2001). 48 half-hour
+  two-channel ambulatory ECG recordings, 360 Hz, with annotated beats
+  including PVCs and PACs.
+sampling_rate_hz: 360
+channels:
+  ecg_a: MLII
+  ecg_b: V5
+physionet_slug: mitdb
+license: ODC-By
+data_dir: data/raw/mitdb
+subset:
+  record_ids: []
+  selection_criteria: ""
