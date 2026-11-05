@@ -44,8 +44,6 @@ resource-constrained" framing.
 HTML holds a human-readable summary with inline plots. If PDF is ever needed,
 a user can "Print to PDF" from the HTML in any browser.
 
-## Open
-
 ### 6. No baseline / calibration module ✅
 Session store promised "before/after HR & HRV" but the baseline-window
 protocol (duration, acceptance criteria, session flow) was implicit.
@@ -62,6 +60,14 @@ and preprocessing choices to be reviewable.
 **Fix applied:** added both — `notebooks/00_data_provenance.ipynb` (workshop:
 generates subset stats and plots live from the data) and `docs/datasets.md`
 (shop window: the readable record of subsets, licenses, selection rationale).
+
+## Open
+
+### Delivery platform (deferred)
+Project is being built as a local Python desktop/laptop app. Whether it
+eventually needs to run on a phone, a Raspberry Pi, or stay on a laptop is
+explicitly **deferred** — revisit when Phase 2 (live sensor) is scoped. No
+code change yet; noted here so the question is not forgotten.
 
 ### 8. Quality-gate test (reduced scope)
 `tests/unit/test_quality_gate.py` is listed but the behavior is not pinned
