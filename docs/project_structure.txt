@@ -131,6 +131,7 @@ biofeedback-htn/
 │
 ├── docs/
 │   ├── architecture.md
+│   ├── roadmap.md                 # phased milestones (M1–M8)
 │   ├── datasets.md                # subsets used, licenses, selection rationale
 │   ├── signal_quality.md          # the "honest core" rationale
 │   ├── evaluation_protocol.md
